@@ -28,7 +28,7 @@ class BatchCreativeInterpolationNode:
                 "ipadapter": ("IPADAPTER", ),
                 "clip_vision": ("CLIP_VISION",),
                 "type_of_frame_distribution": (["linear", "dynamic"],),
-                "linear_frame_distribution_value": ("INT", {"default": 16, "min": 4, "max": 64, "step": 1}),     
+                "linear_frame_distribution_value": ("INT", {"default": 16, "min": 4, "max": 128, "step": 1}),     
                 "dynamic_frame_distribution_values": ("STRING", {"multiline": True, "default": "0,10,26,40"}),                
                 "type_of_key_frame_influence": (["linear", "dynamic"],),
                 "linear_key_frame_influence_value": ("STRING", {"multiline": False, "default": "(1.0,1.0)"}),
@@ -36,7 +36,7 @@ class BatchCreativeInterpolationNode:
                 "type_of_strength_distribution": (["linear", "dynamic"],),
                 "linear_strength_value": ("STRING", {"multiline": False, "default": "(0.3,0.4)"}),
                 "dynamic_strength_values": ("STRING", {"multiline": True, "default": "(0.0,1.0),(0.0,1.0),(0.0,1.0),(0.0,1.0)"}),                                                                                                                                            
-                "buffer": ("INT", {"default": 4, "min": 1, "max": 16, "step": 1}),       
+                "buffer": ("INT", {"default": 4, "min": 1, "max": 64, "step": 1}),       
                 "high_detail_mode": ("BOOLEAN", {"default": True}),                                                                                     
             },
             "optional": {
@@ -231,6 +231,7 @@ class BatchCreativeInterpolationNode:
 
             # Calculate index for interpolation
             index = np.linspace(0, 1, steps // 2 + 1) if revert_direction_at_midpoint else np.linspace(0, 1, steps)
+            index = np.linspace(0, 1, steps * 2) if revert_direction_at_midpoint else np.linspace(0, 1, steps * 2)
 
             # Calculate weights based on interpolation type
             if interpolation == "linear":
@@ -294,6 +295,7 @@ class BatchCreativeInterpolationNode:
 
         # GET KEYFRAME POSITIONS
         keyframe_positions = get_keyframe_positions(type_of_frame_distribution, dynamic_frame_distribution_values, images, linear_frame_distribution_value)                                            
+        print("Keyframe Positions:", keyframe_positions)
         shifted_keyframes_position = [position + buffer - 2 for position in keyframe_positions]
         shifted_keyframe_positions_string = ','.join(str(pos) for pos in shifted_keyframes_position)        
         
